@@ -1,0 +1,113 @@
+<div class="container-fluid py-4" *ngIf="reclamation">
+  <div class="d-flex align-items-center mb-4">
+    <a routerLink="/reclamations" class="btn btn-outline-secondary me-3">
+      <i class="bi bi-arrow-left"></i>
+    </a>
+    <h1 class="page-title mb-0">Réclamation #{{ reclamation.id }}</h1>
+    <span [class]="getBadgeClass(reclamation.statut)" class="ms-3">{{ reclamation.statut }}</span>
+  </div>
+
+  <div *ngIf="message" class="alert alert-{{ messageType }}">{{ message }}</div>
+
+  <div class="row g-4">
+    <!-- Infos réclamation -->
+    <div class="col-md-4">
+      <div class="card p-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Informations</h5>
+        <div class="mb-2"><strong>Client :</strong> {{ reclamation.clientNom }}</div>
+        <div class="mb-2"><strong>Email :</strong> {{ reclamation.clientEmail }}</div>
+        <div class="mb-2"><strong>Produit :</strong> {{ reclamation.produit || '—' }}</div>
+        <div class="mb-2"><strong>Date :</strong> {{ reclamation.date }}</div>
+        <div class="mb-2"><strong>Agent SAV :</strong> {{ reclamation.agentNom || 'Non affecté' }}</div>
+        <div class="mb-2">
+          <strong>Note :</strong>
+          <span *ngFor="let s of getStars(reclamation.note)" class="star-filled ms-1">★</span>
+          <span *ngIf="!reclamation.note" class="text-muted"> Non évaluée</span>
+        </div>
+        <hr>
+        <p class="text-muted">{{ reclamation.description }}</p>
+      </div>
+    </div>
+
+    <!-- Historique des suivis -->
+    <div class="col-md-8">
+      <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-success"></i>Historique des suivis</h5>
+          <button class="btn btn-sm btn-success" (click)="openSuiviModal()">
+            <i class="bi bi-plus-lg me-1"></i>Ajouter un suivi
+          </button>
+        </div>
+
+        <div *ngIf="suivis.length === 0" class="text-center text-muted py-4">
+          <i class="bi bi-clock fs-1 mb-2 d-block"></i>
+          Aucun suivi enregistré pour cette réclamation
+        </div>
+
+        <div class="timeline">
+          <div *ngFor="let s of suivis" class="d-flex mb-4">
+            <div class="me-3 text-center" style="min-width:40px">
+              <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
+                   style="width:40px;height:40px">
+                <i class="bi bi-check2"></i>
+              </div>
+            </div>
+            <div class="card flex-fill p-3 mb-0">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="badge bg-primary">{{ s.action }}</span>
+                <small class="text-muted">{{ s.date | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+              <p class="mb-1">{{ s.message }}</p>
+              <small class="text-muted" *ngIf="s.employeNom">
+                <i class="bi bi-person me-1"></i>{{ s.employeNom }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Suivi -->
+<div class="modal fade" id="suiviModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Ajouter un suivi</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="suiviForm">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Action <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="action"
+                   placeholder="Ex: Prise en charge, Retour produit, Réparation..."
+                   [class.is-invalid]="suiviForm.get('action')?.invalid && suiviForm.get('action')?.touched">
+            <div class="invalid-feedback">Action requise</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Message <span class="text-danger">*</span></label>
+            <textarea class="form-control" formControlName="message" rows="3"
+                      placeholder="Décrivez l'action effectuée..."
+                      [class.is-invalid]="suiviForm.get('message')?.invalid && suiviForm.get('message')?.touched"></textarea>
+            <div class="invalid-feedback">Message requis (min 5 caractères)</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Agent responsable</label>
+            <select class="form-select" formControlName="employeId">
+              <option [value]="null">— Aucun agent —</option>
+              <option *ngFor="let a of agents" [value]="a.id">{{ a.nom }}</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-success" (click)="ajouterSuivi()" [disabled]="suiviForm.invalid">
+          <i class="bi bi-check-lg me-1"></i>Ajouter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

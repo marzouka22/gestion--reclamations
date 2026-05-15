@@ -1,0 +1,82 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title"><i class="bi bi-person-badge-fill me-2"></i>Agents SAV</h1>
+    <button class="btn btn-success" (click)="openCreate()">
+      <i class="bi bi-plus-lg me-1"></i> Nouvel agent
+    </button>
+  </div>
+
+  <div *ngIf="message" class="alert alert-{{ messageType }} alert-dismissible fade show">{{ message }}</div>
+
+  <div class="row g-4">
+    <div class="col-md-4" *ngFor="let agent of agents">
+      <div class="card p-4">
+        <div class="d-flex align-items-center mb-3">
+          <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+            <i class="bi bi-person-badge-fill fs-4 text-success"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold">{{ agent.nom }}</h5>
+            <small class="text-muted">Agent SAV #{{ agent.id }}</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-center mb-3">
+          <i class="bi bi-tools text-muted me-2"></i>
+          <span>{{ agent.competence }}</span>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-primary flex-fill" (click)="openEdit(agent)">
+            <i class="bi bi-pencil-fill me-1"></i> Modifier
+          </button>
+          <button class="btn btn-sm btn-outline-danger flex-fill" (click)="delete(agent.id!)">
+            <i class="bi bi-trash-fill me-1"></i> Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-12" *ngIf="agents.length === 0">
+      <div class="card p-5 text-center text-muted">
+        <i class="bi bi-person-x fs-1 mb-2"></i>
+        <p>Aucun agent SAV enregistré</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Agent -->
+<div class="modal fade" id="agentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-person-badge me-2"></i>
+          {{ editMode ? 'Modifier l\'agent' : 'Nouvel agent SAV' }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="nom"
+                   [class.is-invalid]="form.get('nom')?.invalid && form.get('nom')?.touched">
+            <div class="invalid-feedback">Nom requis (min 2 caractères)</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Compétence <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="competence"
+                   placeholder="Ex: Produits électroniques, Logistique..."
+                   [class.is-invalid]="form.get('competence')?.invalid && form.get('competence')?.touched">
+            <div class="invalid-feedback">Compétence requise</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-success" (click)="save()" [disabled]="form.invalid">
+          <i class="bi bi-check-lg me-1"></i>{{ editMode ? 'Modifier' : 'Créer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

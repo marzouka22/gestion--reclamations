@@ -1,0 +1,156 @@
+<div class="container-fluid py-4">
+  <h1 class="page-title mb-4">
+    <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+  </h1>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-2 text-muted">Chargement des statistiques...</p>
+  </div>
+
+  <ng-container *ngIf="!loading && rapport">
+
+    <!-- Cartes statistiques -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-left-color:#0d6efd">
+          <div class="d-flex align-items-center">
+            <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+              <i class="bi bi-clipboard2-list fs-4 text-primary"></i>
+            </div>
+            <div>
+              <p class="mb-0 text-muted small">Total Réclamations</p>
+              <h3 class="mb-0 fw-bold">{{ rapport.totalReclamations }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-left-color:#ffc107">
+          <div class="d-flex align-items-center">
+            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+              <i class="bi bi-hourglass-split fs-4 text-warning"></i>
+            </div>
+            <div>
+              <p class="mb-0 text-muted small">En Attente</p>
+              <h3 class="mb-0 fw-bold">{{ getCount('EN_ATTENTE') }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-left-color:#198754">
+          <div class="d-flex align-items-center">
+            <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+              <i class="bi bi-check-circle fs-4 text-success"></i>
+            </div>
+            <div>
+              <p class="mb-0 text-muted small">Résolues + Fermées</p>
+              <h3 class="mb-0 fw-bold">{{ getCount('RESOLUE') + getCount('FERMEE') }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-left-color:#fd7e14">
+          <div class="d-flex align-items-center">
+            <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+              <i class="bi bi-star-fill fs-4 text-warning"></i>
+            </div>
+            <div>
+              <p class="mb-0 text-muted small">Note Satisfaction</p>
+              <h3 class="mb-0 fw-bold">{{ getMoyenneArrondie() }} / 5</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Taux de résolution -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-pie-chart me-2 text-primary"></i>Répartition par statut
+          </h5>
+          <div *ngFor="let statut of getStatuts()" class="mb-2">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="badge badge-statut-{{ statut }} px-2 py-1">{{ statut }}</span>
+              <small class="text-muted fw-bold">{{ getCount(statut) }} réclamations</small>
+            </div>
+            <div class="progress" style="height:8px">
+              <div class="progress-bar"
+                   [style.width.%]="rapport.totalReclamations > 0 ? (getCount(statut) / rapport.totalReclamations * 100) : 0"
+                   [ngClass]="{
+                     'bg-warning': statut === 'EN_ATTENTE',
+                     'bg-primary': statut === 'EN_COURS',
+                     'bg-success': statut === 'RESOLUE',
+                     'bg-secondary': statut === 'FERMEE',
+                     'bg-danger': statut === 'ANNULEE'
+                   }">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3">
+            <i class="bi bi-graph-up me-2 text-success"></i>Indicateurs clés
+          </h5>
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span>Taux de résolution</span>
+            <span class="badge bg-success fs-6">{{ rapport.tauxResolution }}</span>
+          </div>
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span>Réclamations évaluées</span>
+            <span class="badge bg-info fs-6">{{ rapport.reclamationsEvaluees }}</span>
+          </div>
+          <div class="d-flex justify-content-between py-2 border-bottom">
+            <span>Note moyenne satisfaction</span>
+            <span class="badge bg-warning text-dark fs-6">
+              <i class="bi bi-star-fill me-1"></i>{{ getMoyenneArrondie() }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liens rapides -->
+    <div class="row g-3">
+      <div class="col-12">
+        <h5 class="fw-bold mb-2"><i class="bi bi-lightning me-2"></i>Accès rapide</h5>
+      </div>
+      <div class="col-md-3">
+        <a routerLink="/reclamations" class="card p-3 text-decoration-none text-dark d-flex flex-row align-items-center">
+          <i class="bi bi-exclamation-triangle-fill fs-3 text-warning me-3"></i>
+          <span>Voir les réclamations</span>
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a routerLink="/clients" class="card p-3 text-decoration-none text-dark d-flex flex-row align-items-center">
+          <i class="bi bi-people-fill fs-3 text-primary me-3"></i>
+          <span>Gérer les clients</span>
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a routerLink="/agents" class="card p-3 text-decoration-none text-dark d-flex flex-row align-items-center">
+          <i class="bi bi-person-badge-fill fs-3 text-success me-3"></i>
+          <span>Agents SAV</span>
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a routerLink="/rapport" class="card p-3 text-decoration-none text-dark d-flex flex-row align-items-center">
+          <i class="bi bi-bar-chart-fill fs-3 text-danger me-3"></i>
+          <span>Rapport satisfaction</span>
+        </a>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

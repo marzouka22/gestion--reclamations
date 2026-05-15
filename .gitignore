@@ -1,0 +1,30 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# Eclipse
+.classpath
+.project
+.settings/
+.factorypath
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Spring Boot
+spring-pid
+
+# Angular
+reclamations-frontend/node_modules/
+reclamations-frontend/dist/
+reclamations-frontend/.angular/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

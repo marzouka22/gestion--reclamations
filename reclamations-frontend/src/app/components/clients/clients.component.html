@@ -1,0 +1,107 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title"><i class="bi bi-people-fill me-2"></i>Gestion des Clients</h1>
+    <button class="btn btn-primary" (click)="openCreate()">
+      <i class="bi bi-plus-lg me-1"></i> Nouveau client
+    </button>
+  </div>
+
+  <!-- Alerte -->
+  <div *ngIf="message" class="alert alert-{{ messageType }} alert-dismissible fade show" role="alert">
+    {{ message }}
+  </div>
+
+  <!-- Recherche -->
+  <div class="card mb-3 p-3">
+    <div class="input-group">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="form-control" placeholder="Rechercher par nom, email ou téléphone..."
+             [(ngModel)]="searchTerm" (input)="filter()">
+      <button class="btn btn-outline-secondary" *ngIf="searchTerm" (click)="searchTerm=''; filter()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of filtered">
+            <td class="text-muted">{{ c.id }}</td>
+            <td class="fw-semibold">{{ c.nom }}</td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.telephone }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary me-1" (click)="openEdit(c)" title="Modifier">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="delete(c.id!)" title="Supprimer">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="5" class="text-center text-muted py-4">Aucun client trouvé</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-muted small">
+      {{ filtered.length }} client(s) affiché(s) sur {{ clients.length }}
+    </div>
+  </div>
+</div>
+
+<!-- Modal Créer/Modifier Client -->
+<div class="modal fade" id="clientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-person-fill me-2"></i>
+          {{ editMode ? 'Modifier le client' : 'Nouveau client' }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="nom"
+                   [class.is-invalid]="form.get('nom')?.invalid && form.get('nom')?.touched">
+            <div class="invalid-feedback">Nom requis (2-50 caractères)</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" formControlName="email"
+                   [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched">
+            <div class="invalid-feedback">Email valide requis</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Téléphone <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="telephone" placeholder="8 chiffres"
+                   [class.is-invalid]="form.get('telephone')?.invalid && form.get('telephone')?.touched">
+            <div class="invalid-feedback">8 chiffres requis</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="save()" [disabled]="form.invalid">
+          <i class="bi bi-check-lg me-1"></i>{{ editMode ? 'Modifier' : 'Créer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,196 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Réclamations</h1>
+    <button class="btn btn-primary" (click)="openCreate()">
+      <i class="bi bi-plus-lg me-1"></i> Nouvelle réclamation
+    </button>
+  </div>
+
+  <div *ngIf="message" class="alert alert-{{ messageType }} alert-dismissible fade show">{{ message }}</div>
+
+  <!-- Filtres -->
+  <div class="card mb-3 p-3">
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      <span class="fw-semibold me-2"><i class="bi bi-funnel me-1"></i>Filtrer :</span>
+      <button class="btn btn-sm" [class.btn-primary]="!filterStatut" [class.btn-outline-secondary]="filterStatut"
+              (click)="filterStatut=''; applyFilter()">Tout ({{ reclamations.length }})</button>
+      <button *ngFor="let s of statuts" class="btn btn-sm"
+              [class.btn-primary]="filterStatut===s" [class.btn-outline-secondary]="filterStatut!==s"
+              (click)="filterStatut=s; applyFilter()">
+        {{ s.replace('_', ' ') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Client</th>
+            <th>Produit</th>
+            <th>Description</th>
+            <th>Statut</th>
+            <th>Agent</th>
+            <th>Date</th>
+            <th>Note</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filtered">
+            <td class="text-muted">{{ r.id }}</td>
+            <td class="fw-semibold">{{ r.clientNom }}</td>
+            <td>{{ r.produit || '—' }}</td>
+            <td style="max-width:200px">
+              <span class="text-truncate d-block" title="{{ r.description }}">{{ r.description }}</span>
+            </td>
+            <td><span [class]="getBadgeClass(r.statut)">{{ r.statut }}</span></td>
+            <td>{{ r.agentNom || '—' }}</td>
+            <td>{{ r.date }}</td>
+            <td>
+              <span *ngFor="let s of getStars(r.note)" class="star-filled">★</span>
+              <span *ngIf="!r.note" class="text-muted small">—</span>
+            </td>
+            <td class="text-center" style="white-space:nowrap">
+              <button class="btn btn-sm btn-outline-info me-1" (click)="voirDetail(r.id!)" title="Détail / Suivi">
+                <i class="bi bi-eye-fill"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-success me-1" (click)="openAffect(r)" title="Affecter agent">
+                <i class="bi bi-person-check-fill"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-warning me-1" (click)="openStatut(r)" title="Changer statut">
+                <i class="bi bi-arrow-repeat"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary me-1" (click)="openNote(r)" title="Évaluer" [disabled]="r.note != null">
+                <i class="bi bi-star-fill"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="delete(r.id!)" title="Supprimer">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="9" class="text-center text-muted py-4">Aucune réclamation trouvée</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer text-muted small">{{ filtered.length }} réclamation(s) affichée(s)</div>
+  </div>
+</div>
+
+<!-- Modal Nouvelle Réclamation -->
+<div class="modal fade" id="reclamationModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Nouvelle réclamation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="form">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Client <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="clientId"
+                    [class.is-invalid]="form.get('clientId')?.invalid && form.get('clientId')?.touched">
+              <option [value]="null" disabled>Sélectionner un client...</option>
+              <option *ngFor="let c of clients" [value]="c.id">{{ c.nom }} ({{ c.email }})</option>
+            </select>
+            <div class="invalid-feedback">Client requis</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Produit</label>
+            <input type="text" class="form-control" formControlName="produit" placeholder="Nom du produit concerné">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
+            <textarea class="form-control" formControlName="description" rows="4"
+                      placeholder="Décrivez le problème (min 10 caractères)..."
+                      [class.is-invalid]="form.get('description')?.invalid && form.get('description')?.touched"></textarea>
+            <div class="invalid-feedback">Description requise (min 10 caractères)</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="form.invalid">
+          <i class="bi bi-check-lg me-1"></i>Créer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Affecter Agent -->
+<div class="modal fade" id="affectModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-check me-2"></i>Affecter un agent</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Réclamation #{{ selectedRec?.id }} — {{ selectedRec?.clientNom }}</p>
+        <select class="form-select" [formControl]="$any(affectForm.controls['agentId'])">
+          <option [value]="null" disabled>Sélectionner un agent...</option>
+          <option *ngFor="let a of agents" [value]="a.id">{{ a.nom }} ({{ a.competence }})</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-success" (click)="affecter()" [disabled]="affectForm.invalid">Affecter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Changer Statut -->
+<div class="modal fade" id="statutModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-arrow-repeat me-2"></i>Changer le statut</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <select class="form-select" [formControl]="$any(statutForm.controls['statut'])">
+          <option *ngFor="let s of statuts" [value]="s">{{ s.replace('_',' ') }}</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-warning" (click)="changerStatut()">Modifier</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Évaluer -->
+<div class="modal fade" id="noteModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-star-fill me-2"></i>Évaluer</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Note de satisfaction du client (1 à 5)</p>
+        <select class="form-select" [formControl]="$any(noteForm.controls['note'])">
+          <option [value]="null" disabled>Choisir une note...</option>
+          <option value="1">⭐ 1 — Très insatisfait</option>
+          <option value="2">⭐⭐ 2 — Insatisfait</option>
+          <option value="3">⭐⭐⭐ 3 — Neutre</option>
+          <option value="4">⭐⭐⭐⭐ 4 — Satisfait</option>
+          <option value="5">⭐⭐⭐⭐⭐ 5 — Très satisfait</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button class="btn btn-warning" (click)="evaluer()" [disabled]="noteForm.invalid">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

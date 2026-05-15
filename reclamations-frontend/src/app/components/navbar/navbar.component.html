@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">
+      <i class="bi bi-clipboard2-check-fill me-2"></i>
+      Gestion Réclamations
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+            <i class="bi bi-speedometer2 me-1"></i> Tableau de bord
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/clients" routerLinkActive="active">
+            <i class="bi bi-people-fill me-1"></i> Clients
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/agents" routerLinkActive="active">
+            <i class="bi bi-person-badge-fill me-1"></i> Agents SAV
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/reclamations" routerLinkActive="active">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Réclamations
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/rapport" routerLinkActive="active">
+            <i class="bi bi-bar-chart-fill me-1"></i> Rapport
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

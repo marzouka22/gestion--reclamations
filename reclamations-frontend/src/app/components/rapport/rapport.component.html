@@ -1,0 +1,106 @@
+<div class="container-fluid py-4">
+  <h1 class="page-title mb-4"><i class="bi bi-bar-chart-fill me-2"></i>Rapport de Satisfaction Client</h1>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <ng-container *ngIf="!loading && rapport">
+
+    <!-- KPIs principaux -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="card p-4 text-center border-0 bg-primary text-white">
+          <i class="bi bi-clipboard2-list fs-1 mb-2"></i>
+          <h2 class="fw-bold">{{ rapport.totalReclamations }}</h2>
+          <p class="mb-0">Total réclamations</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-4 text-center border-0 bg-success text-white">
+          <i class="bi bi-star-fill fs-1 mb-2"></i>
+          <h2 class="fw-bold">{{ getMoyenneArrondie() }}</h2>
+          <p class="mb-0">Moyenne satisfaction / 5</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-4 text-center border-0 bg-info text-white">
+          <i class="bi bi-check-circle-fill fs-1 mb-2"></i>
+          <h2 class="fw-bold">{{ rapport.reclamationsEvaluees }}</h2>
+          <p class="mb-0">Réclamations évaluées</p>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-4 text-center border-0 bg-warning text-dark">
+          <i class="bi bi-percent fs-1 mb-2"></i>
+          <h2 class="fw-bold">{{ rapport.tauxResolution }}</h2>
+          <p class="mb-0">Taux de résolution</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Répartition par statut -->
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart me-2 text-primary"></i>Répartition par statut</h5>
+          <div *ngFor="let statut of keys(rapport.repartitionParStatut)" class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="badge bg-{{ getBadgeColor(statut) }}">{{ statut }}</span>
+              <strong>{{ rapport.repartitionParStatut[statut] }}</strong>
+            </div>
+            <div class="progress" style="height:10px">
+              <div class="progress-bar bg-{{ getBadgeColor(statut) }}"
+                   [style.width.%]="rapport.totalReclamations > 0 ? (rapport.repartitionParStatut[statut] / rapport.totalReclamations * 100) : 0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distribution des notes -->
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-star-half me-2 text-warning"></i>Distribution des notes</h5>
+          <div *ngFor="let noteKey of keys(rapport.distributionNotes)" class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-warning fw-bold">{{ getNote(noteKey) }}</span>
+              <span>{{ rapport.distributionNotes[noteKey] }} avis</span>
+            </div>
+            <div class="progress" style="height:10px">
+              <div class="progress-bar bg-warning"
+                   [style.width.%]="rapport.reclamationsEvaluees > 0 ? (rapport.distributionNotes[noteKey] / rapport.reclamationsEvaluees * 100) : 0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Par agent -->
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-person-badge me-2 text-success"></i>Réclamations par agent</h5>
+          <div *ngFor="let agent of keys(rapport.repartitionParAgent)" class="d-flex justify-content-between py-2 border-bottom">
+            <span><i class="bi bi-person me-1"></i>{{ agent }}</span>
+            <span class="badge bg-success">{{ rapport.repartitionParAgent[agent] }}</span>
+          </div>
+          <p *ngIf="keys(rapport.repartitionParAgent).length === 0" class="text-muted">Aucune donnée</p>
+        </div>
+      </div>
+
+      <!-- Par client -->
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-people me-2 text-danger"></i>Top clients (réclamations)</h5>
+          <div *ngFor="let client of keys(rapport.reclamationsParClient)" class="d-flex justify-content-between py-2 border-bottom">
+            <span><i class="bi bi-person-fill me-1"></i>{{ client }}</span>
+            <span class="badge bg-danger">{{ rapport.reclamationsParClient[client] }}</span>
+          </div>
+          <p *ngIf="keys(rapport.reclamationsParClient).length === 0" class="text-muted">Aucune donnée</p>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+</div>
