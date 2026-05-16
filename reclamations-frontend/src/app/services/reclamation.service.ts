@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Reclamation } from '../models/reclamation.model';
 
-const API = 'http://localhost:800/api/reclamations';
+const API = 'http://localhost:9096/api/reclamations';
 
 @Injectable({ providedIn: 'root' })
 export class ReclamationService {
@@ -34,11 +34,11 @@ export class ReclamationService {
   }
 
   changerStatut(id: number, statut: string): Observable<Reclamation> {
-    return this.http.put<Reclamation>(`${API}/${id}/statut?statut=${statut}`, {});
+    return this.http.put<Reclamation>(`${API}/${id}/statut`, { statut });
   }
 
   evaluer(id: number, note: number): Observable<Reclamation> {
-    return this.http.put<Reclamation>(`${API}/${id}/evaluer/${note}`, {});
+    return this.http.put<Reclamation>(`${API}/${id}/evaluer`, { note });
   }
 
   getParClient(clientId: number): Observable<Reclamation[]> {
