@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SuiviReclamation } from '../models/suivi-reclamation.model';
 
-const API = 'http://localhost:800/api/suivis';
+const API = 'http://localhost:9096/api/suivis';
 
 @Injectable({ providedIn: 'root' })
 export class SuiviService {

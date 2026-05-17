@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Client } from '../models/client.model';
 
-const API = 'http://localhost:800/api/clients';
+const API = 'http://localhost:9096/api/clients';
 
 @Injectable({ providedIn: 'root' })
 export class ClientService {
