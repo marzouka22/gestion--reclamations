@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-const API = 'http://localhost:9096/api/rapports';
+const API = '/api/rapports';
 
 @Injectable({ providedIn: 'root' })
 export class RapportService {

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AgentSAV } from '../models/agent-sav.model';
 
-const API = 'http://localhost:9096/api/agents';
+const API = '/api/agents';
 
 @Injectable({ providedIn: 'root' })
 export class AgentSavService {

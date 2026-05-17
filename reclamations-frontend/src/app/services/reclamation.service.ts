@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Reclamation } from '../models/reclamation.model';
 
-const API = 'http://localhost:9096/api/reclamations';
+const API = '/api/reclamations';
 
 @Injectable({ providedIn: 'root' })
 export class ReclamationService {
